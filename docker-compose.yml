@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    container_name: manthanx-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: manthanx
+      POSTGRES_PASSWORD: manthanx
+      POSTGRES_DB: manthanx
+    ports:
+      - "5432:5432"
+    volumes:
+      - manthanx_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U manthanx"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: manthanx-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+
+  backend:
+    build: ./backend
+    container_name: manthanx-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    volumes:
+      - ./backend:/app
+
+volumes:
+  manthanx_pgdata:
