@@ -33,5 +33,5 @@ async def synthesizer_node(state: AgentState) -> dict:
         f"Critic's assessment: {state.get('critic_notes', 'N/A')}"
     )
 
-    answer = await generate(promt=prompt, system_instruction=SYNTHESIZER_SYSTEM_PROMPT)
-    return {"final answer": answer.strip()}
+    answer = await generate(prompt=prompt, system_instruction=SYNTHESIZER_SYSTEM_PROMPT)
+    return {"final_answer": answer.strip()}
