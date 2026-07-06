@@ -2,6 +2,7 @@ from typing import TypedDict
 
 class AgentState(TypedDict):
     question: str
+    history: str
     route: str
     retrieved_chunks: list[dict]
     critic_notes: str

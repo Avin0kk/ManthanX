@@ -28,6 +28,7 @@ async def synthesizer_node(state: AgentState) -> dict:
         chunks_text = "(no chunks retrieved)"
 
     prompt = (
+        f"Conversation so far:\n{state.get('history', '(no prior messages)')}\n\n"
         f"Question: {state['question']}\n\n"
         f"Retrieved content:\n{chunks_text}\n\n"
         f"Critic's assessment: {state.get('critic_notes', 'N/A')}"
