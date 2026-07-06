@@ -35,7 +35,7 @@ async def upload_document(file: UploadFile, db: AsyncSession = Depends(get_db)):
 
     return DocumentUploadResponse(document=DocumentOut.model_validate(document), chunk_count=chunk_count)
 
-router.get("", response_model=list[DocumentOut])
+@router.get("", response_model=list[DocumentOut])
 async def list_documents(db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(Document).order_by(Document.created_at.desc()))
     return result.scalars().all()
