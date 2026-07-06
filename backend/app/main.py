@@ -31,3 +31,4 @@ app.include_router(documents.router)
 @app.get("/health")
 async def health_check():
     return {"status": "ok", "app": settings.APP_NAME, "environment": settings.ENVIRONMENT}
+
