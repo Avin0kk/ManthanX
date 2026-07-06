@@ -14,3 +14,11 @@ class DocumentOut(BaseModel):
 class DocumentUploadResponse(BaseModel):
     document: DocumentOut
     chunk_count: int
+
+class ChunkResult(BaseModel):
+    chunk_id: str
+    document_id: str
+    document_title: str
+    chunk_index: int
+    content: str
+    similarity: float

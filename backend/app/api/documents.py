@@ -4,7 +4,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Chunk, Document
 from app.db.session import get_db
-from app.schemas.document import DocumentOut, DocumentUploadResponse
+from app.schemas.document import DocumentOut, DocumentUploadResponse, ChunkResult
+from app.services.retrieval import retrieve_relevant_chunks
 from app.services.file_parsing import UnsupportedFileType
 from app.services.ingestion import ingest_document
 
@@ -48,3 +49,8 @@ async def delete_document(document_id: str, db: AsyncSession = Depends(get_db)):
     
     await db.delete(document)
     await db.commit()
+
+@router.get("/search", response_model=list[ChunkResult])
+async def search_chunks(q: str, top_k: int = 5, db: AsyncSession = Depends(get_db)):
+    results = await retrieve_relevant_chunks(db, query=q, top_k=top_k)
+    return results
