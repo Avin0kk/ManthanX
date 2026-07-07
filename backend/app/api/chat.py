@@ -15,6 +15,7 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 async def event_stream(payload: ChatRequest, db: AsyncSession):
     conversation = await get_or_create_conversation(db, payload.conversation_id)
     history = await get_history_text(db, conversation.id)
+    yield f"data: {json.dumps({'node': 'debug_history', 'output': {'history': history}})}\n\n"
 
     await save_message(db, conversation.id, role="user", content=payload.question)
 

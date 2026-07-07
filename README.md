@@ -10,12 +10,6 @@ Built as a portfolio project to demonstrate backend engineering, RAG
 pipelines, and multi-agent orchestration alongside traditional full-stack
 work.
 
-## Status: Phase 1 (in progress)
-
-Currently building the foundational backend: FastAPI skeleton, async
-Postgres + pgvector setup, and the document ingestion pipeline
-(PDF/DOCX/TXT → chunk → embed → store). No agents yet — that's Phase 2.
-
 ## Tech Stack
 
 | Layer | Tech |
