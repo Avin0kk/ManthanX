@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     REDIS_URL: str
 
     GEMINI_API_KEY: str
-    LLM_MODEL: str = "gemini-2.5-flash"
+    LLM_MODEL: str = "gemini-2.5-flash-lite"
 
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60

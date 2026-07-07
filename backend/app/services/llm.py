@@ -1,6 +1,8 @@
 from functools import lru_cache
 
 from google import genai
+from google.genai.errors import ClientError, ServerError
+
 from app.core.config import settings
 
 @lru_cache(maxsize=1)
@@ -15,10 +17,16 @@ async def generate(prompt: str, system_instruction: str | None = None) -> str:
 
     client = _get_client()
 
-    response = client.models.generate_content(
-        model=settings.LLM_MODEL,
-        contents=prompt,
-        config={"system_instruction": system_instruction} if system_instruction else None,
-    )
-
+    try:
+        response = client.models.generate_content(
+            model=settings.LLM_MODEL,
+            contents=prompt,
+            config={"system_instruction": system_instruction} if system_instruction else None,
+        )
+    except ClientError as e:
+        if e.code == 429:
+            return "I'm getting a lot of requests right now - please wait about a minute and try again."
+        raise
+    except ServerError:
+        return "Gemini is experiencing high demand right now - please try again in a moment."
     return response.text
