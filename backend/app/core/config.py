@@ -18,4 +18,10 @@ class Settings(BaseSettings):
 
     TAVILY_API_KEY: str | None = None
 
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/auth/google/callback"
+    FRONTEND_URL: str = "http://localhost:3000"
+    JWT_SECRET_KEY: str
+
 settings = Settings()
