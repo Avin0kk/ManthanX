@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { API_URL } from "@/lib/api";
+import { getToken } from "@/lib/auth"
 import AgentActivityPanel from "./AgentActivityPanel";
 
 type AgentStatus = "pending" | "active" | "complete";
@@ -32,7 +33,7 @@ export default function ChatPanel() {
     try {
       const res = await fetch(`${API_URL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}`, },
         body: JSON.stringify({
           question,
           conversation_id: conversationId.current,

@@ -8,12 +8,14 @@ from app.agents.graph import build_agent_graph
 from app.db.session import get_db
 from app.schemas.chat import ChatRequest
 from app.services.conversations import get_or_create_conversation, get_history_text, save_message
+from app.api.deps import get_current_user
+from app.db.models import User
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 
 
-async def event_stream(payload: ChatRequest, db: AsyncSession):
-    conversation = await get_or_create_conversation(db, payload.conversation_id)
+async def event_stream(payload: ChatRequest, db: AsyncSession, user: User):
+    conversation = await get_or_create_conversation(db, user.id, payload.conversation_id)
     history = await get_history_text(db, conversation.id)
     yield f"data: {json.dumps({'node': 'debug_history', 'output': {'history': history}})}\n\n"
 
@@ -31,8 +33,6 @@ async def event_stream(payload: ChatRequest, db: AsyncSession):
     }
 
     final_state = {}
-
-    yield f"data: {json.dumps({'node': 'conversation', 'output': {'conversation_id': str(conversation.id)}})}\n\n"
 
     async for event in graph.astream(initial_state):
         for node_name, node_output in event.items():
@@ -54,8 +54,8 @@ async def event_stream(payload: ChatRequest, db: AsyncSession):
 
 
 @router.post("")
-async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db)):
+async def chat(payload: ChatRequest, db: AsyncSession = Depends(get_db), user: User = Depends(get_current_user),):
     return StreamingResponse(
-        event_stream(payload, db),
+        event_stream(payload, db, user),
         media_type="text/event-stream",
     )
