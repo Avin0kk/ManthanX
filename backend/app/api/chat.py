@@ -15,13 +15,13 @@ router = APIRouter(prefix="/chat", tags=["chat"])
 
 
 async def event_stream(payload: ChatRequest, db: AsyncSession, user: User):
-    conversation = await get_or_create_conversation(db, user.id, payload.conversation_id)
+    conversation = await get_or_create_conversation(db, user.id, payload.conversation_id, first_message=payload.question)
     history = await get_history_text(db, conversation.id)
     yield f"data: {json.dumps({'node': 'debug_history', 'output': {'history': history}})}\n\n"
 
     await save_message(db, conversation.id, role="user", content=payload.question)
 
-    graph = build_agent_graph(db)
+    graph = build_agent_graph(db, user.id)
 
     initial_state = {
         "question": payload.question,

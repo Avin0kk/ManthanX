@@ -14,6 +14,7 @@ class Document(Base):
     __tablename__ = "documents"
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"))
     title: Mapped[str] = mapped_column(String(500))
     source_type: Mapped[str] = mapped_column(String(50))  # pdf | docx | txt | url
     source_uri: Mapped[str | None] = mapped_column(String(2000), nullable=True)

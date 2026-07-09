@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/api";
+import { getToken } from "@/lib/auth";
 
 type Document = {
   id: string;
@@ -17,7 +18,9 @@ export default function DocumentPanel() {
 
   async function fetchDocuments() {
     try {
-      const res = await fetch(`${API_URL}/documents`);
+      const res = await fetch(`${API_URL}/documents`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
       const data = await res.json();
       setDocuments(data);
     } catch {
@@ -42,6 +45,7 @@ export default function DocumentPanel() {
     try {
       const res = await fetch(`${API_URL}/documents/upload`, {
         method: "POST",
+        headers: { Authorization: `Bearer ${getToken()}` },
         body: formData,
       });
       if (!res.ok) {
@@ -59,7 +63,10 @@ export default function DocumentPanel() {
 
   async function handleDelete(id: string) {
     try {
-      await fetch(`${API_URL}/documents/${id}`, { method: "DELETE" });
+      await fetch(`${API_URL}/documents/${id}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
       await fetchDocuments();
     } catch {
       setError("Could not delete document");

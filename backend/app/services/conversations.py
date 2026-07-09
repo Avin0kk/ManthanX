@@ -5,13 +5,14 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models import Conversation, Message
 
-async def get_or_create_conversation(db: AsyncSession, user_id, conversation_id: uuid.UUID | None) -> Conversation:
+async def get_or_create_conversation(db: AsyncSession, user_id, conversation_id: uuid.UUID | None, first_message: str | None = None) -> Conversation:
     if conversation_id:
         conversation = await db.get(Conversation, conversation_id)
         if conversation and conversation.user_id == user_id:
             return conversation
-        
-    conversation = Conversation(user_id=user_id)
+
+    title = (first_message[:50] + "...") if first_message and len(first_message) > 50 else (first_message or "New conversation")
+    conversation = Conversation(user_id=user_id, title=title)
     db.add(conversation)
     await db.flush()
     return conversation

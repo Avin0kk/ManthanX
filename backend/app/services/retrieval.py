@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models import Chunk, Document
 from app.services.embeddings import embed_query
 
-async def retrieve_relevant_chunks(db: AsyncSession, query: str, top_k: int = 5) -> list[dict]:
+async def retrieve_relevant_chunks(db: AsyncSession, user_id, query: str, top_k: int = 5) -> list[dict]:
     """
     Embeds the query and finds the top_k most similar chunks in the database
     using cosine distance (smaller distance = more similar).
@@ -22,6 +22,7 @@ async def retrieve_relevant_chunks(db: AsyncSession, query: str, top_k: int = 5)
             Chunk.embedding.cosine_distance(query_vector).label("distance"),
         )
         .join(Document, Chunk.document_id == Document.id)
+        .where(Document.user_id == user_id)
         .order_by("distance")
         .limit(top_k)
     )

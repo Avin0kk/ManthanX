@@ -6,7 +6,7 @@ from app.services.embeddings import embed_texts
 from app.services.file_parsing import extract_text
 
 
-async def ingest_document(db: AsyncSession, filename: str, content: bytes) -> Document:
+async def ingest_document(db: AsyncSession, user_id, filename: str, content: bytes) -> Document:
     ext = filename.lower().rsplit(".", 1)[-1] if "." in filename else "txt"
 
     text = extract_text(filename, content)
@@ -17,7 +17,7 @@ async def ingest_document(db: AsyncSession, filename: str, content: bytes) -> Do
 
     embeddings = embed_texts(pieces)
 
-    document = Document(title=filename, source_type=ext)
+    document = Document(title=filename, source_type=ext, user_id=user_id)
     db.add(document)
     await db.flush()  # assigns document.id without committing yet
 

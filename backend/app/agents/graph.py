@@ -7,11 +7,11 @@ from app.agents.researcher import make_researcher_node
 from app.agents.critic import critic_node
 from app.agents.synthesizer import synthesizer_node
 
-def build_agent_graph(db: AsyncSession):
+def build_agent_graph(db: AsyncSession, user_id):
     graph = StateGraph(AgentState)
 
     graph.add_node("router", router_node)
-    graph.add_node("researcher", make_researcher_node(db))
+    graph.add_node("researcher", make_researcher_node(db, user_id))
     graph.add_node("critic", critic_node)
     graph.add_node("synthesizer", synthesizer_node)
 

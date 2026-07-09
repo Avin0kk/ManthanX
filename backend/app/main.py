@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
-from app.api import documents, chat, auth
+from app.api import documents, chat, auth, conversations
 from app.core.config import settings
 from app.db.session import Base, engine
 from app.db import models
@@ -32,6 +32,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(auth.router)
+app.incluce_router(conversations.router)
 
 @app.get("/health")
 async def health_check():
