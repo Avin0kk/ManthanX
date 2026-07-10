@@ -32,7 +32,7 @@ app.add_middleware(SessionMiddleware, secret_key=settings.SECRET_KEY)
 app.include_router(documents.router)
 app.include_router(chat.router)
 app.include_router(auth.router)
-app.incluce_router(conversations.router)
+app.include_router(conversations.router)
 
 @app.get("/health")
 async def health_check():

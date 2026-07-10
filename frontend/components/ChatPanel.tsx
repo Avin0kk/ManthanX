@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { API_URL } from "@/lib/api";
-import { getToken } from "@/lib/auth"
+import { getToken } from "@/lib/auth";
 import AgentActivityPanel from "./AgentActivityPanel";
 
 type AgentStatus = "pending" | "active" | "complete";
@@ -12,16 +12,53 @@ type Message = {
   content: string;
 };
 
-export default function ChatPanel() {
+type Props = {
+  conversationId: string | null;
+  onConversationCreated: (id: string) => void;
+};
+
+export default function ChatPanel({ conversationId, onConversationCreated }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [statuses, setStatuses] = useState<Record<string, AgentStatus>>({});
   const [criticNotes, setCriticNotes] = useState<string | null>(null);
-  const conversationId = useRef<string | null>(null);
+  const activeConversationId = useRef<string | null>(conversationId);
+  const isSending = useRef(false);
+
+  useEffect(() => {
+    activeConversationId.current = conversationId;
+
+    async function loadMessages() {
+      if (!conversationId) {
+        setMessages([]);
+        setCriticNotes(null);
+        setStatuses({});
+        return;
+      }
+      try {
+        const res = await fetch(`${API_URL}/conversations/${conversationId}/messages`, {
+          headers: { Authorization: `Bearer ${getToken()}` },
+        });
+        if (!res.ok) return;
+        const data = await res.json();
+        setMessages(data.map((m: { role: "user" | "assistant"; content: string }) => ({
+          role: m.role,
+          content: m.content,
+        })));
+        setStatuses({});
+        setCriticNotes(null);
+      } catch {
+        // non-critical
+      }
+    }
+
+    loadMessages();
+  }, [conversationId]);
 
   async function handleSend() {
-    if (!input.trim() || loading) return;
+    if (!input.trim() || isSending.current) return;
+    isSending.current = true;
 
     const question = input.trim();
     setMessages((prev) => [...prev, { role: "user", content: question }]);
@@ -33,10 +70,13 @@ export default function ChatPanel() {
     try {
       const res = await fetch(`${API_URL}/chat`, {
         method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${getToken()}`, },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${getToken()}`,
+        },
         body: JSON.stringify({
           question,
-          conversation_id: conversationId.current,
+          conversation_id: activeConversationId.current,
         }),
       });
 
@@ -60,7 +100,11 @@ export default function ChatPanel() {
           const event = JSON.parse(json);
 
           if (event.node === "conversation") {
-            conversationId.current = event.output.conversation_id;
+            const newId = event.output.conversation_id;
+            if (activeConversationId.current !== newId) {
+              activeConversationId.current = newId;
+              onConversationCreated(newId);
+            }
           } else if (event.node === "router") {
             setStatuses({ router: "complete", researcher: "active" });
           } else if (event.node === "researcher") {
@@ -70,20 +114,15 @@ export default function ChatPanel() {
             setCriticNotes(event.output.critic_notes);
           } else if (event.node === "synthesizer") {
             setStatuses((prev) => ({ ...prev, synthesizer: "complete" }));
-            setMessages((prev) => [
-              ...prev,
-              { role: "assistant", content: event.output.final_answer },
-            ]);
+            setMessages((prev) => [...prev, { role: "assistant", content: event.output.final_answer }]);
           }
         }
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Something went wrong. Please try again." },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Something went wrong. Please try again." }]);
     } finally {
       setLoading(false);
+      isSending.current = false;
     }
   }
 
@@ -95,9 +134,7 @@ export default function ChatPanel() {
             <div
               key={i}
               className={`text-sm max-w-[80%] px-4 py-2 rounded-sm ${
-                msg.role === "user"
-                  ? "self-end bg-ink text-paper"
-                  : "self-start bg-hairline/40"
+                msg.role === "user" ? "self-end bg-ink text-paper" : "self-start bg-hairline/40"
               }`}
             >
               {msg.content}
