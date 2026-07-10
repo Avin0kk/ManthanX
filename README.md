@@ -141,7 +141,7 @@ frontend/
 ├── api.ts                backend URL config
 └── auth.ts               token storage helpers
 
-## Design notes (talking points)
+<!-- ## Design notes (talking points)
 
 - **Async throughout** — FastAPI + SQLAlchemy's async engine, so ingestion,
   retrieval, and agent calls never block the event loop.
@@ -159,7 +159,7 @@ frontend/
   under someone else's account.
 - **Retry with backoff on LLM calls** — free-tier rate limits and
   provider-side outages are real, not hypothetical. Transient failures are
-  retried automatically before falling back to an honest error message.
+  retried automatically before falling back to an honest error message. -->
 
 <!-- ## Possible future improvements
 
