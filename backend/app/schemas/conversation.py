@@ -18,3 +18,7 @@ class MessageOut(BaseModel):
     content: str
     agent_trace: str | None
     created_at: datetime
+
+class ConversationRename(BaseModel):
+    title: str
+    

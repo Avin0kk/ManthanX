@@ -93,7 +93,7 @@ npm run dev
 Visit http://localhost:3000, sign in with Google, upload a document, and
 start asking questions.
 
-## Project layout
+<!-- ## Project layout
 backend/
 ├── Dockerfile
 ├── requirements.txt
@@ -139,7 +139,7 @@ frontend/
 │   └── Header.tsx               nav + auth state
 └── lib/
 ├── api.ts                backend URL config
-└── auth.ts               token storage helpers
+└── auth.ts               token storage helpers -->
 
 <!-- ## Design notes (talking points)
 
