@@ -18,6 +18,7 @@ class Document(Base):
     title: Mapped[str] = mapped_column(String(500))
     source_type: Mapped[str] = mapped_column(String(50))  # pdf | docx | txt | url
     source_uri: Mapped[str | None] = mapped_column(String(2000), nullable=True)
+    summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     chunks: Mapped[list["Chunk"]] = relationship(back_populates="document", cascade="all, delete-orphan")

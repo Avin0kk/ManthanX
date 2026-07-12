@@ -9,6 +9,7 @@ class DocumentOut(BaseModel):
     id: uuid.UUID
     title: str
     source_type: str
+    summary: str | None
     created_at: datetime
 
 class DocumentUploadResponse(BaseModel):

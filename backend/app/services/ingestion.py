@@ -4,6 +4,7 @@ from app.db.models import Chunk, Document
 from app.services.chunking import chunk_text
 from app.services.embeddings import embed_texts
 from app.services.file_parsing import extract_text
+from app.services.summarization import generate_summary
 
 
 async def ingest_document(db: AsyncSession, user_id, filename: str, content: bytes) -> Document:
@@ -23,6 +24,12 @@ async def ingest_document(db: AsyncSession, user_id, filename: str, content: byt
 
     for i, (piece, vector) in enumerate(zip(pieces, embeddings)):
         db.add(Chunk(document_id=document.id, chunk_index=i, content=piece, embedding=vector))
+
+    preview_text = "\n\n".join(pieces[:5])
+    try:
+        document.summary = await generate_summary(preview_text)
+    except Exception:
+        document.summary = None
 
     await db.commit()
     await db.refresh(document)

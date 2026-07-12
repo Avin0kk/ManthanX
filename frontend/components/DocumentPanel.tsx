@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "@/lib/api";
 import { getToken } from "@/lib/auth";
+import DocumentPreviewModal from "./DocumentPreviewModel";
 
 type Document = {
   id: string;
   title: string;
   source_type: string;
+  summary: string | null;
   created_at: string;
 };
 
@@ -15,6 +17,7 @@ export default function DocumentPanel() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewDoc, setPreviewDoc] = useState<Document | null>(null);
 
   async function fetchDocuments() {
     try {
@@ -84,17 +87,27 @@ export default function DocumentPanel() {
         {documents.map((doc) => (
           <div
             key={doc.id}
-            className="flex items-center justify-between gap-2 border border-hairline rounded-sm px-3 py-2 text-sm"
+            onClick={() => setPreviewDoc(doc)}
+            className="flex items-center justify-between gap-2 border border-hairline rounded-sm px-3 py-2 text-sm cursor-pointer hover:border-teal transition-colors"
           >
             <span className="truncate">{doc.title}</span>
             <button
-              onClick={() => handleDelete(doc.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDelete(doc.id);
+              }}
               className="text-ink/40 hover:text-critic text-xs shrink-0"
             >
               remove
             </button>
           </div>
         ))}
+        <DocumentPreviewModal
+        open={previewDoc !== null}
+        title={previewDoc?.title || ""}
+        summary={previewDoc?.summary || null}
+        onClose={() => setPreviewDoc(null)}
+      />
       </div>
 
       {error && <p className="text-xs text-critic mb-2">{error}</p>}
