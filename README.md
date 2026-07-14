@@ -93,6 +93,25 @@ npm run dev
 Visit http://localhost:3000, sign in with Google, upload a document, and
 start asking questions.
 
+## Screenshots
+
+### Landing page
+![Landing page](docs/screenshots/landing-page.png)
+
+### Multi-agent chat with live activity and citations
+![Chat interface](docs/screenshots/chat-interface.png)
+
+Each answer is grounded in retrieved document chunks, with the agent
+activity panel showing Router → Researcher → Critic → Synthesizer
+completing in real time, and the Critic's assessment of retrieval
+sufficiency shown alongside the answer.
+
+### AI-generated document preview
+![Document preview](docs/screenshots/document-preview.png)
+
+Uploaded documents are automatically summarized on ingestion, so you get
+an instant preview without having to open the file.
+
 <!-- ## Project layout
 backend/
 ├── Dockerfile
